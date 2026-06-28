@@ -10,7 +10,10 @@
 #include <stdbool.h>
 
 #include "esp_err.h"
-#include "driver/sdmmc_host.h"
+#include "sd_protocol_types.h"
+
+#define ESP_VISION_SDCARD_INTERFACE_SDMMC (1)
+#define ESP_VISION_SDCARD_INTERFACE_SDSPI (2)
 
 void esp_vision_sdcard_init0(void);
 bool esp_vision_sdcard_is_present(void);

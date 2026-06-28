@@ -41,7 +41,6 @@
 #include "esp_idf_version.h"
 #include "esp_log.h"
 
-#if SOC_SDMMC_HOST_SUPPORTED
 MP_WEAK esp_err_t esp_vision_sdcard_preinit_host(sdmmc_host_t *host, int slot) {
     (void)host;
     (void)slot;
@@ -52,7 +51,6 @@ MP_WEAK void esp_vision_sdcard_deinit_host(sdmmc_host_t *host, int slot) {
     (void)host;
     (void)slot;
 }
-#endif
 
 #define DEBUG 0
 #if DEBUG
@@ -85,6 +83,7 @@ const mp_obj_type_t machine_sdcard_type;
 typedef struct _sdcard_obj_t {
     mp_obj_base_t base;
     mp_int_t flags;
+    mp_int_t slot;
     sdmmc_host_t host;
     // The card structure duplicates the host. It's not clear if we
     // can avoid this given the way that it is copied.
@@ -285,7 +284,8 @@ static mp_obj_t machine_sdcard_make_new(const mp_obj_type_t *type, size_t n_args
         arg_vals[ARG_cmd].u_obj, arg_vals[ARG_data].u_obj);
     #endif
 
-    int slot_num = arg_vals[ARG_slot].u_int;
+    int public_slot_num = arg_vals[ARG_slot].u_int;
+    int slot_num = public_slot_num;
     if (slot_num < SD_SLOT_MIN || slot_num > SD_SLOT_MAX) {
         mp_raise_ValueError(MP_ERROR_TEXT("invalid slot number"));
     }
@@ -320,6 +320,7 @@ static mp_obj_t machine_sdcard_make_new(const mp_obj_type_t *type, size_t n_args
 
     sdcard_card_obj_t *self = mp_obj_malloc_with_finaliser(sdcard_card_obj_t, &machine_sdcard_type);
     self->flags = 0;
+    self->slot = public_slot_num;
     // Note that these defaults are macros that expand to structure
     // constants so we can't directly assign them to fields.
     int freq = arg_vals[ARG_freq].u_int;
@@ -328,6 +329,7 @@ static mp_obj_t machine_sdcard_make_new(const mp_obj_type_t *type, size_t n_args
         _temp_host.max_freq_khz = freq / 1000;
         // SPI SDMMC sets the slot to the SPI host ID
         _temp_host.slot = spi_dev_defaults[slot_num].host_id;
+        check_esp_err(esp_vision_sdcard_preinit_host(&_temp_host, public_slot_num));
         self->host = _temp_host;
     }
     #if SOC_SDMMC_HOST_SUPPORTED
@@ -342,7 +344,7 @@ static mp_obj_t machine_sdcard_make_new(const mp_obj_type_t *type, size_t n_args
             _temp_host.deinit = &sdmmc_host_deinit_dummy;
         }
         #endif
-        check_esp_err(esp_vision_sdcard_preinit_host(&_temp_host, slot_num));
+        check_esp_err(esp_vision_sdcard_preinit_host(&_temp_host, public_slot_num));
         self->host = _temp_host;
     }
     #endif
@@ -474,9 +476,7 @@ static mp_obj_t sd_deinit(mp_obj_t self_in) {
             // SD card used a (dedicated) SPI bus, so free that SPI bus.
             spi_bus_free(self->host.slot);
         }
-        #if SOC_SDMMC_HOST_SUPPORTED
-        esp_vision_sdcard_deinit_host(&self->host, self->host.slot);
-        #endif
+        esp_vision_sdcard_deinit_host(&self->host, self->slot);
         self->flags &= ~SDCARD_CARD_FLAGS_HOST_INIT_DONE;
     }
 

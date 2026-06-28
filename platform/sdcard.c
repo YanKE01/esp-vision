@@ -23,6 +23,18 @@
 #define ESP_VISION_SDCARD_MOUNT_PATH "/sdcard"
 #endif
 
+#ifndef ESP_VISION_SDCARD_INTERFACE
+#if SOC_SDMMC_HOST_SUPPORTED
+#define ESP_VISION_SDCARD_INTERFACE ESP_VISION_SDCARD_INTERFACE_SDMMC
+#else
+#define ESP_VISION_SDCARD_INTERFACE ESP_VISION_SDCARD_INTERFACE_SDSPI
+#endif
+#endif
+
+#if ESP_VISION_SDCARD_INTERFACE == ESP_VISION_SDCARD_INTERFACE_SDMMC
+#if !SOC_SDMMC_HOST_SUPPORTED
+#error "ESP_VISION_SDCARD_INTERFACE_SDMMC requires SOC_SDMMC_HOST_SUPPORTED"
+#endif
 #ifndef ESP_VISION_SDCARD_SLOT
 #define ESP_VISION_SDCARD_SLOT (0)
 #endif
@@ -30,17 +42,45 @@
 #ifndef ESP_VISION_SDCARD_BUS_WIDTH
 #define ESP_VISION_SDCARD_BUS_WIDTH (4)
 #endif
+#elif ESP_VISION_SDCARD_INTERFACE == ESP_VISION_SDCARD_INTERFACE_SDSPI
+#ifndef ESP_VISION_SDCARD_SLOT
+#define ESP_VISION_SDCARD_SLOT (2)
+#endif
+#else
+#error "Unsupported ESP_VISION_SDCARD_INTERFACE"
+#endif
 
-#if SOC_SDMMC_USE_GPIO_MATRIX && \
+#ifndef ESP_VISION_SDCARD_FREQ
+#define ESP_VISION_SDCARD_FREQ (20000000)
+#endif
+
+#if !defined(ESP_VISION_SDCARD_SCK_PIN) && defined(ESP_VISION_SDCARD_CLK_PIN)
+#define ESP_VISION_SDCARD_SCK_PIN ESP_VISION_SDCARD_CLK_PIN
+#endif
+
+#if ESP_VISION_SDCARD_INTERFACE == ESP_VISION_SDCARD_INTERFACE_SDMMC && \
+    SOC_SDMMC_USE_GPIO_MATRIX && \
     defined(ESP_VISION_SDCARD_CLK_PIN) && \
     defined(ESP_VISION_SDCARD_CMD_PIN) && \
     defined(ESP_VISION_SDCARD_D0_PIN)
-#define ESP_VISION_SDCARD_HAS_PIN_CONFIG (1)
+#define ESP_VISION_SDCARD_HAS_SDMMC_PIN_CONFIG (1)
 #else
-#define ESP_VISION_SDCARD_HAS_PIN_CONFIG (0)
+#define ESP_VISION_SDCARD_HAS_SDMMC_PIN_CONFIG (0)
 #endif
 
+#if ESP_VISION_SDCARD_INTERFACE == ESP_VISION_SDCARD_INTERFACE_SDSPI && \
+    defined(ESP_VISION_SDCARD_MISO_PIN) && \
+    defined(ESP_VISION_SDCARD_MOSI_PIN) && \
+    defined(ESP_VISION_SDCARD_SCK_PIN) && \
+    defined(ESP_VISION_SDCARD_CS_PIN)
+#define ESP_VISION_SDCARD_HAS_SDSPI_PIN_CONFIG (1)
+#else
+#define ESP_VISION_SDCARD_HAS_SDSPI_PIN_CONFIG (0)
+#endif
+
+#if MICROPY_HW_ENABLE_SDCARD
 static const char *TAG = "esp_vision_sdcard";
+#endif
 
 MP_WEAK void esp_vision_board_sdcard_init0(void)
 {
@@ -106,16 +146,22 @@ void esp_vision_sdcard_mount_if_present(void)
     nlr_buf_t nlr;
     if (nlr_push(&nlr) == 0) {
         const char *path = ESP_VISION_SDCARD_MOUNT_PATH;
-        mp_obj_t sdcard_kwargs[10];
+        mp_obj_t sdcard_kwargs[16];
         size_t sdcard_kwarg_count = 0;
         sdcard_kwargs[(2 * sdcard_kwarg_count) + 0] = MP_OBJ_NEW_QSTR(MP_QSTR_slot);
         sdcard_kwargs[(2 * sdcard_kwarg_count) + 1] = MP_OBJ_NEW_SMALL_INT(ESP_VISION_SDCARD_SLOT);
         sdcard_kwarg_count++;
+
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 0] = MP_OBJ_NEW_QSTR(MP_QSTR_freq);
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 1] = MP_OBJ_NEW_SMALL_INT(ESP_VISION_SDCARD_FREQ);
+        sdcard_kwarg_count++;
+
+#if ESP_VISION_SDCARD_INTERFACE == ESP_VISION_SDCARD_INTERFACE_SDMMC
         sdcard_kwargs[(2 * sdcard_kwarg_count) + 0] = MP_OBJ_NEW_QSTR(MP_QSTR_width);
         sdcard_kwargs[(2 * sdcard_kwarg_count) + 1] = MP_OBJ_NEW_SMALL_INT(ESP_VISION_SDCARD_BUS_WIDTH);
         sdcard_kwarg_count++;
 
-#if ESP_VISION_SDCARD_HAS_PIN_CONFIG
+#if ESP_VISION_SDCARD_HAS_SDMMC_PIN_CONFIG
         sdcard_kwargs[(2 * sdcard_kwarg_count) + 0] = MP_OBJ_NEW_QSTR(MP_QSTR_sck);
         sdcard_kwargs[(2 * sdcard_kwarg_count) + 1] = MP_OBJ_NEW_SMALL_INT(ESP_VISION_SDCARD_CLK_PIN);
         sdcard_kwarg_count++;
@@ -142,6 +188,34 @@ void esp_vision_sdcard_mount_if_present(void)
 #endif
         sdcard_kwargs[(2 * sdcard_kwarg_count) + 0] = MP_OBJ_NEW_QSTR(MP_QSTR_data);
         sdcard_kwargs[(2 * sdcard_kwarg_count) + 1] = mp_obj_new_tuple(MP_ARRAY_SIZE(data_pins), data_pins);
+        sdcard_kwarg_count++;
+#endif
+#elif ESP_VISION_SDCARD_INTERFACE == ESP_VISION_SDCARD_INTERFACE_SDSPI
+#if ESP_VISION_SDCARD_HAS_SDSPI_PIN_CONFIG
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 0] = MP_OBJ_NEW_QSTR(MP_QSTR_miso);
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 1] = MP_OBJ_NEW_SMALL_INT(ESP_VISION_SDCARD_MISO_PIN);
+        sdcard_kwarg_count++;
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 0] = MP_OBJ_NEW_QSTR(MP_QSTR_mosi);
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 1] = MP_OBJ_NEW_SMALL_INT(ESP_VISION_SDCARD_MOSI_PIN);
+        sdcard_kwarg_count++;
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 0] = MP_OBJ_NEW_QSTR(MP_QSTR_sck);
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 1] = MP_OBJ_NEW_SMALL_INT(ESP_VISION_SDCARD_SCK_PIN);
+        sdcard_kwarg_count++;
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 0] = MP_OBJ_NEW_QSTR(MP_QSTR_cs);
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 1] = MP_OBJ_NEW_SMALL_INT(ESP_VISION_SDCARD_CS_PIN);
+        sdcard_kwarg_count++;
+#endif
+#endif
+
+#if defined(ESP_VISION_SDCARD_CD_PIN)
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 0] = MP_OBJ_NEW_QSTR(MP_QSTR_cd);
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 1] = MP_OBJ_NEW_SMALL_INT(ESP_VISION_SDCARD_CD_PIN);
+        sdcard_kwarg_count++;
+#endif
+
+#if defined(ESP_VISION_SDCARD_WP_PIN)
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 0] = MP_OBJ_NEW_QSTR(MP_QSTR_wp);
+        sdcard_kwargs[(2 * sdcard_kwarg_count) + 1] = MP_OBJ_NEW_SMALL_INT(ESP_VISION_SDCARD_WP_PIN);
         sdcard_kwarg_count++;
 #endif
 
