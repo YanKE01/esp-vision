@@ -1,0 +1,36 @@
+# SPDX-FileCopyrightText: 2026 Espressif Systems (Shanghai) CO LTD
+# SPDX-License-Identifier: Apache-2.0
+
+name: esp-vision
+version: "0.1.0"
+description: ESP-VISION core image processing component for ESP-IDF applications
+license: "Apache-2.0 AND MIT"
+dependencies:
+  idf:
+    version: ">=5.3.0"
+files:
+  use_gitignore: true
+  exclude:
+    - ".github/**/*"
+    - ".gitignore"
+    - ".gitlab/**/*"
+    - ".gitlab-ci.yml"
+    - ".gitmodules"
+    - ".pre-commit-config.yaml"
+    - "boards/**/*"
+    - "build/**/*"
+    - "docs/**/*"
+    - "example/**/*"
+    - "lib/**/*"
+    - "models/**/*"
+    - "modules/**/*"
+    - "overlay/**/*"
+    - "platform/**/*"
+    - "stubs/**/*"
+    - "tools/**/*"
+    - "components/zxing/**/*"
+    - "CLAUDE.md"
+    - "Makefile"
+    - "README_ZH.md"
+    - "idf_ext.py"
+    - "micropython.cmake"

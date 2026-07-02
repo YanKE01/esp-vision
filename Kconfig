@@ -1,0 +1,72 @@
+menu "ESP-VISION Core"
+
+    config ESP_VISION_CORE_ENABLE_LAB_LUT
+        bool "Enable LAB color lookup table"
+        default y
+
+    config ESP_VISION_CORE_ENABLE_BINARY_OPS
+        bool "Enable binary image operations"
+        default y
+
+    config ESP_VISION_CORE_ENABLE_MATH_OPS
+        bool "Enable image math operations"
+        default y
+
+    config ESP_VISION_CORE_ENABLE_DRAWING
+        bool "Enable drawing primitives"
+        default y
+
+    config ESP_VISION_CORE_ENABLE_BLOBS
+        bool "Enable color blob detection"
+        default y
+        select ESP_VISION_CORE_ENABLE_LAB_LUT
+
+    config ESP_VISION_CORE_ENABLE_QRCODES
+        bool "Enable QR code detection"
+        default y
+
+    config ESP_VISION_CORE_ENABLE_APRILTAGS
+        bool "Enable AprilTag detection"
+        default y
+
+    if ESP_VISION_CORE_ENABLE_APRILTAGS
+
+        config ESP_VISION_CORE_APRILTAG_TAG16H5
+            bool "Enable AprilTag TAG16H5 family"
+            default y
+
+        config ESP_VISION_CORE_APRILTAG_TAG25H7
+            bool "Enable AprilTag TAG25H7 family"
+            default y
+
+        config ESP_VISION_CORE_APRILTAG_TAG25H9
+            bool "Enable AprilTag TAG25H9 family"
+            default y
+
+        config ESP_VISION_CORE_APRILTAG_TAG36H10
+            bool "Enable AprilTag TAG36H10 family"
+            default y
+
+        config ESP_VISION_CORE_APRILTAG_TAG36H11
+            bool "Enable AprilTag TAG36H11 family"
+            default y
+
+        config ESP_VISION_CORE_APRILTAG_ARTOOLKIT
+            bool "Enable AprilTag ARToolKit family"
+            default n
+
+        config ESP_VISION_CORE_ENABLE_HIGH_RES_APRILTAGS
+            bool "Enable high-resolution AprilTag buffers"
+            default n
+
+        config ESP_VISION_CORE_ENABLE_FINE_APRILTAGS
+            bool "Enable fine AprilTag quad refinement"
+            default n
+
+    endif
+
+    config ESP_VISION_CORE_ENABLE_FILTERS
+        bool "Build imlib filter kernels"
+        default n
+
+endmenu
