@@ -1,0 +1,19 @@
+# Local environment, third-party assets, and reproducible generated results.
+.venv/
+.cache/
+__pycache__/
+data/
+models/
+prepared/
+quantized/
+evaluation/
+evaluation_qdq/
+study/
+mpl-cache/
+*.log
+calibration_manifest.json
+model_inventory.json
+quantization_summary.json
+export_summary.json
+verification.json
+espdl_interface_reference.txt

@@ -1,0 +1,74 @@
+[
+  {
+    "path": "models/nanotrack_backbone_sim.onnx",
+    "url": "https://raw.githubusercontent.com/HonglinChu/SiamTrackers/248663fde6bf7c40190cf10ee396d5662919ecd3/NanoTrack/models/nanotrackv2/nanotrack_backbone_sim.onnx",
+    "bytes": 1056849,
+    "sha256": "530bdd0cd00f19afab79a863e71ba71e3312395a5dc9151af675082bdaaa2fc4"
+  },
+  {
+    "path": "models/nanotrack_head_sim.onnx",
+    "url": "https://raw.githubusercontent.com/HonglinChu/SiamTrackers/248663fde6bf7c40190cf10ee396d5662919ecd3/NanoTrack/models/nanotrackv2/nanotrack_head_sim.onnx",
+    "bytes": 726198,
+    "sha256": "0d8c0637be849f092cc7236cae02e55c8b9455ebe37ba50601d6115db4247cd9"
+  },
+  {
+    "path": "data/david/video.webm",
+    "url": "https://raw.githubusercontent.com/opencv/opencv_extra/6b66aee565e86a0d8831daa313f40d6ac0efbd6c/testdata/cv/tracking/david/data/david.webm",
+    "bytes": 3917558,
+    "sha256": "4bbe69b7d097379af4d7ad128f02692820dc57a6d8275ea2b9e7eef4399a3e61"
+  },
+  {
+    "path": "data/david/gt.txt",
+    "url": "https://raw.githubusercontent.com/opencv/opencv_extra/6b66aee565e86a0d8831daa313f40d6ac0efbd6c/testdata/cv/tracking/david/gt.txt",
+    "bytes": 6101,
+    "sha256": "8e46f079b39f7877f9650bcf2fc42879b03f22d77ef832ca1d3e1ed258269588"
+  },
+  {
+    "path": "data/david/config.yml",
+    "url": "https://raw.githubusercontent.com/opencv/opencv_extra/6b66aee565e86a0d8831daa313f40d6ac0efbd6c/testdata/cv/tracking/david/david.yml",
+    "bytes": 87,
+    "sha256": "b66f1b8ec8fd2dedf1ebde197323da0d23249eab95778aaa42fad7d8ac78c713"
+  },
+  {
+    "path": "data/faceocc2/video.webm",
+    "url": "https://raw.githubusercontent.com/opencv/opencv_extra/6b66aee565e86a0d8831daa313f40d6ac0efbd6c/testdata/cv/tracking/faceocc2/data/faceocc2.webm",
+    "bytes": 4134756,
+    "sha256": "5ffedeca4fb3acfd65e6f6aa71f016f748628727be1e24914fde2198b42089c5"
+  },
+  {
+    "path": "data/faceocc2/gt.txt",
+    "url": "https://raw.githubusercontent.com/opencv/opencv_extra/6b66aee565e86a0d8831daa313f40d6ac0efbd6c/testdata/cv/tracking/faceocc2/gt.txt",
+    "bytes": 10509,
+    "sha256": "7d7b2dc7251e20fbb2fedfc36356ffbc7146ce59f49c21dfe251b8714b87ab88"
+  },
+  {
+    "path": "data/faceocc2/config.yml",
+    "url": "https://raw.githubusercontent.com/opencv/opencv_extra/6b66aee565e86a0d8831daa313f40d6ac0efbd6c/testdata/cv/tracking/faceocc2/faceocc2.yml",
+    "bytes": 85,
+    "sha256": "dbdba70a8b3188609292b5291d8409378baaff50df9340c340aa44adee88b42c"
+  },
+  {
+    "path": "models/UPSTREAM_LICENSE",
+    "url": "https://raw.githubusercontent.com/HonglinChu/SiamTrackers/248663fde6bf7c40190cf10ee396d5662919ecd3/NanoTrack/LICENSE",
+    "bytes": 11357,
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  {
+    "path": "data/dudek/video.webm",
+    "url": "https://raw.githubusercontent.com/opencv/opencv_extra/6b66aee565e86a0d8831daa313f40d6ac0efbd6c/testdata/cv/tracking/dudek/data/dudek.webm",
+    "bytes": 5902992,
+    "sha256": "679c95a22c71e259971ccaaabf805fdba55c70e224b28eafa7536b7989c722e1"
+  },
+  {
+    "path": "data/dudek/gt.txt",
+    "url": "https://raw.githubusercontent.com/opencv/opencv_extra/6b66aee565e86a0d8831daa313f40d6ac0efbd6c/testdata/cv/tracking/dudek/gt.txt",
+    "bytes": 17623,
+    "sha256": "6645d041ab014a2b3b7f34ca271c1ac42d3d72a9546443c7cc9c542f772f56c4"
+  },
+  {
+    "path": "data/dudek/config.yml",
+    "url": "https://raw.githubusercontent.com/opencv/opencv_extra/6b66aee565e86a0d8831daa313f40d6ac0efbd6c/testdata/cv/tracking/dudek/dudek.yml",
+    "bytes": 85,
+    "sha256": "08e6bfe53a749e2660798627448d166c30553e9d8e4620386a51bc5f760bc7a9"
+  }
+]

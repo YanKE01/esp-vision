@@ -5,6 +5,36 @@ espdl -- 模型推理
 
 ``espdl`` 模块在采集到的图像上运行 ESP-DL 的 ``.espdl`` 模型，并提供常见任务封装：目标检测（:py:class:`PedestrianDetect`\ 、:py:class:`ESPDet`\ 、:py:class:`YOLO11`\ ）、姿态估计（:py:class:`YOLO11nPose`\ ）和图像分类（:py:class:`ImageNetCls`\ ），同时可通过 :py:class:`Model` 将 ESP-DL 原始输出 tensor 暴露给 Python。
 
+触摸框选单目标追踪
+------------------
+
+``espdl.NanoTrack`` 运行 NanoTrack V2 全 INT8 模型。将 ``models/nanotrack_v2/`` 中的三个 ``.espdl`` 文件复制到设备的 ``/sdcard/nanotrack_v2/`` 即可，也可以通过 ``experiments/nanotrack-v2`` 重新生成。P4/S31 使用 ESP32-P4 导出物；本封装不接受混合 INT16 实验模型。S3 需要面向 S3 重新量化并单独验证。
+
+.. code-block:: python
+
+   import espdl, sensor
+
+   tracker = espdl.NanoTrack(
+       "/sdcard/nanotrack_v2/template_deploy.espdl",
+       "/sdcard/nanotrack_v2/search_deploy.espdl",
+       "/sdcard/nanotrack_v2/head_deploy.espdl",
+   )
+   try:
+       tracker.init(sensor.snapshot(), (80, 60, 64, 64))
+       while True:
+           img = sensor.snapshot()
+           result = tracker.track(img, threshold=0.5)
+           if result is not None:
+               x, y, w, h, score = result
+               img.draw_rectangle(x, y, w, h, color=(0, 255, 0))
+           img.flush()
+   finally:
+       tracker.deinit()
+
+``init(image, roi)`` 缓存目标特征，然后释放模板模型；搜索模型和 head 常驻，重新框选时临时重载模板模型。同一次追踪使用尺寸不变、未绘制标注的 RGB565 或灰度图像。结果为 ``(x, y, w, h, score)``；低于阈值时返回 ``None``，不更新上一搜索状态。分数不能保证目标仍然可见。这是局部单目标追踪，不包含全局自动找回或网络权重训练。
+
+``example/03-Machine-Learning/00-ESP-DL/nanotrack_touch.py`` 在拖动时冻结当前显示图像，忽略留黑区域的初始触摸，将 LCD 坐标映射回相机图像，并允许重新框选。需要启用触摸的板卡；ESP32-P4X-EYE 可运行追踪 API，但没有配置触摸控制器。选区至少为 10x10 相机像素。推理在绘制标注前完成，避免图形进入模型输入。
+
 原始输出 tensor
 ---------------
 

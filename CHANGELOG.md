@@ -6,7 +6,9 @@ All notable changes to ESP-VISION are recorded here. The format follows [Keep a 
 
 ### Added
 
+- Added an INT8 `espdl.NanoTrack` wrapper with cached template features, native crop/quantization and tracking post-processing, a touch-drag selection example, and the three full-INT8 exports under `models/nanotrack_v2` with metadata and provenance.
 - Added LCD touch support and drawing/read examples for ESP32-P4 Function EV Board and ESP32-S31 Mosaico through Board Manager.
+- Added a reproducible NanoTrack V2 CPU quantization experiment under `experiments/nanotrack-v2`, with a uv project for direct `uv run` execution, pinned dependencies and asset checksums, ESP-DL and ONNX Q/DQ export, and tracking accuracy comparisons.
 - Added runtime IPA and manual ISP control to the `sensor` module through `set_ipa()`, `get_ipa()`, `set_isp()`, and `get_isp()`, covering the exposure, pixel gain, demosaic, white balance, LSC, BLC, BF, sharpen, CCM, and gamma blocks over the ESP Video V4L2 controls. The feature is opt-in per board through `ESP_VISION_ENABLE_CAMERA_IPA_CONTROL` and is enabled on `ESP32_P4X_FUNCTION_EV_BOARD` and `ESP32_P4X_EYE`, with documentation in the `sensor` API reference and an example under `example/01-Camera/04-IPA`.
 - Added a hardware-in-the-loop CI stage that flashes the `ESP32_P4X_FUNCTION_EV_BOARD` build onto a real board and tests its camera and LCD, through `tools/ci/flash_and_test.py` and `tools/ci/device_checks.py`.
 

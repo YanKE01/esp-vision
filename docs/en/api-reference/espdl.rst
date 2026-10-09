@@ -5,6 +5,36 @@ espdl -- Model Inference
 
 The ``espdl`` module runs ESP-DL ``.espdl`` models on captured images. It provides task-specific wrappers for object detection (:py:class:`PedestrianDetect`, :py:class:`ESPDet`, :py:class:`YOLO11`), pose estimation (:py:class:`YOLO11nPose`), and image classification (:py:class:`ImageNetCls`), plus :py:class:`Model` for exposing raw ESP-DL output tensors to Python.
 
+Touch-Selected Single-Object Tracking
+------------------------------------
+
+``espdl.NanoTrack`` runs NanoTrack V2 full-INT8 models. Copy the three ``.espdl`` files from ``models/nanotrack_v2/`` to ``/sdcard/nanotrack_v2/``. They can also be regenerated with ``experiments/nanotrack-v2``. Use the ESP32-P4 exports for P4/S31; the mixed INT16 experiment exports are not accepted by this wrapper. S3 requires target-specific quantization and separate validation.
+
+.. code-block:: python
+
+   import espdl, sensor
+
+   tracker = espdl.NanoTrack(
+       "/sdcard/nanotrack_v2/template_deploy.espdl",
+       "/sdcard/nanotrack_v2/search_deploy.espdl",
+       "/sdcard/nanotrack_v2/head_deploy.espdl",
+   )
+   try:
+       tracker.init(sensor.snapshot(), (80, 60, 64, 64))
+       while True:
+           img = sensor.snapshot()
+           result = tracker.track(img, threshold=0.5)
+           if result is not None:
+               x, y, w, h, score = result
+               img.draw_rectangle(x, y, w, h, color=(0, 255, 0))
+           img.flush()
+   finally:
+       tracker.deinit()
+
+``init(image, roi)`` caches target features, then frees the template model. Search and head models remain loaded; selecting a new target reloads the template model temporarily. Use unannotated RGB565 or grayscale images of the same dimensions throughout a track. The returned tuple is ``(x, y, w, h, score)``; below-threshold results return ``None`` without updating the previous search state. Scores do not guarantee target visibility. This is local single-object tracking without automatic global reacquisition or training of network weights.
+
+``example/03-Machine-Learning/00-ESP-DL/nanotrack_touch.py`` freezes the displayed image while dragging, ignores initial touches in letterbox margins, maps LCD coordinates into the camera image, and supports reselection. It requires a touch-enabled board; ESP32-P4X-EYE supports the tracker API but has no configured touch controller. Select at least 10x10 camera pixels. Inference precedes drawing so overlays do not enter model inputs.
+
 Raw Output Tensors
 ------------------
 
